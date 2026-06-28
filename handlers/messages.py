@@ -45,6 +45,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif text == "❓ Yordam":
         from handlers.commands import help_command
         await help_command(update, context)
+    elif text == "🤖 AI Chat":
+        await show_ai_chat(update, context)
     else:
         # Foydalanuvchi holatini tekshirish
         state = user_states.get(user_id, {})
@@ -58,6 +60,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await do_conversation(update, context, text)
         elif action == "exercise":
             await do_exercise(update, context, text)
+        elif action == "ai_chat":
+            await do_ai_chat(update, context, text)
         else:
             # Oddiy suhbat (AI javob)
             await ai_chat(update, context, text)
@@ -292,5 +296,58 @@ async def ai_chat(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str)
     else:
         await update.message.reply_text(
             "❌ Xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
+            reply_markup=get_main_menu()
+        )
+
+
+# === AI CHAT FUNKSIYASI ===
+
+async def show_ai_chat(update, context):
+    """AI Chat menyusini ko'rsatish"""
+    from utils.keyboards import get_ai_chat_menu
+    await update.message.reply_text(
+        "🤖 <b>AI Chat - Claude AI</b>\n\n"
+        "Men bilan istalgan mavzuda gaplashing!\n\n"
+        "🇩🇪 <b>Nemis tilida gaplash</b> — men ham nemis tilida javob beraman va xatolaringizni to'g'rilayman\n"
+        "🇺🇿 <b>O'zbek tilida gaplash</b> — nemis tili haqida savollar bering\n\n"
+        "<i>Rejimni tanlang yoki hoziroq yozing:</i>",
+        parse_mode="HTML",
+        reply_markup=get_ai_chat_menu()
+    )
+
+
+async def do_ai_chat(update, context, text):
+    """Claude AI bilan suhbat"""
+    from utils.ai_chat_client import ai_chat
+    from utils.keyboards import get_ai_stop_menu
+    user_id = update.effective_user.id
+    state = user_states.get(user_id, {})
+    mode = state.get("ai_mode", "uzbek")
+    history = state.get("ai_history", [])
+
+    await update.message.reply_text("🤖 O'ylayapman...")
+
+    # Tarixga qo'shish
+    history.append({"role": "user", "content": text})
+
+    # Faqat so'nggi 10 ta xabar (context limit)
+    recent_history = history[-10:]
+
+    result = ai_chat.chat(recent_history, mode=mode)
+
+    if result:
+        # AI javobini tarixga qo'shish
+        history.append({"role": "assistant", "content": result})
+        user_states[user_id]["ai_history"] = history[-20:]
+
+        await update.message.reply_text(
+            f"🤖 {result}",
+            parse_mode="HTML",
+            reply_markup=get_ai_stop_menu()
+        )
+        add_points(user_id, 1)
+    else:
+        await update.message.reply_text(
+            "❌ Xatolik yuz berdi. Qayta urinib ko'ring.",
             reply_markup=get_main_menu()
         )

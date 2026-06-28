@@ -4,16 +4,38 @@ Telegram inline va reply keyboardlar
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 
 
-# Asosiy menyu
+# Asosiy menyu - AI Chat tugmasi qo'shildi
 MAIN_MENU = [
     ["🇩🇪 Darslar", "📚 Lug'at"],
     ["🔄 Tarjima", "💬 Suhbat"],
     ["📝 Mashq", "📊 Daraja"],
-    ["⚙️ Sozlamalar", "❓ Yordam"]
+    ["🤖 AI Chat", "⚙️ Sozlamalar"],
+    ["❓ Yordam"]
 ]
 
 def get_main_menu():
     return ReplyKeyboardMarkup(MAIN_MENU, resize_keyboard=True)
+
+
+# AI Chat menyusi
+AI_CHAT_MENU = [
+    [InlineKeyboardButton("🆕 Yangi suhbat", callback_data="ai_new_chat")],
+    [InlineKeyboardButton("🇩🇪 Nemis tilida gaplash", callback_data="ai_german_mode")],
+    [InlineKeyboardButton("🇺🇿 O'zbek tilida gaplash", callback_data="ai_uzbek_mode")],
+    [InlineKeyboardButton("🔙 Orqaga", callback_data="back_main")],
+]
+
+def get_ai_chat_menu():
+    return InlineKeyboardMarkup(AI_CHAT_MENU)
+
+
+# AI Chat davomida stop tugmasi
+AI_STOP_MENU = [
+    [InlineKeyboardButton("⏹ Suhbatni tugatish", callback_data="ai_stop")],
+]
+
+def get_ai_stop_menu():
+    return InlineKeyboardMarkup(AI_STOP_MENU)
 
 
 # Darajalar menyusi

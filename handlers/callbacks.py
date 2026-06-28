@@ -224,6 +224,56 @@ Javob: [harf]"
             reply_markup=get_lessons_menu()
         )
 
+
+    # === AI CHAT ===
+    elif data == "ai_new_chat":
+        from handlers.messages import user_states, show_ai_chat
+        from utils.keyboards import get_ai_stop_menu
+        user_states[user_id] = {"action": "ai_chat", "ai_mode": "auto", "ai_history": []}
+        await query.edit_message_text(
+            "🤖 <b>AI Chat boshlandi!</b>\n\n"
+            "Endi menga istalgan narsani yozing — o\'zbek yoki nemis tilida.\n"
+            "Men javob beraman, xatolaringizni to\'g\'rilaman va tushuntiraman.\n\n"
+            "<i>Tugatish uchun ⏹ tugmasini bosing</i>",
+            parse_mode="HTML",
+            reply_markup=get_ai_stop_menu()
+        )
+
+    elif data == "ai_german_mode":
+        from handlers.messages import user_states
+        from utils.keyboards import get_ai_stop_menu
+        user_states[user_id] = {"action": "ai_chat", "ai_mode": "german", "ai_history": []}
+        await query.edit_message_text(
+            "🇩🇪 <b>Nemis tilida suhbat rejimi!</b>\n\n"
+            "Men FAQAT nemis tilida javob beraman.\n"
+            "Xatolaringizni to\'g\'rilaman va tarjima beraman.\n\n"
+            "<i>Guten Start! Schreiben Sie auf Deutsch! ✍️</i>",
+            parse_mode="HTML",
+            reply_markup=get_ai_stop_menu()
+        )
+
+    elif data == "ai_uzbek_mode":
+        from handlers.messages import user_states
+        from utils.keyboards import get_ai_stop_menu
+        user_states[user_id] = {"action": "ai_chat", "ai_mode": "uzbek", "ai_history": []}
+        await query.edit_message_text(
+            "🇺🇿 <b>O\'zbek tilida suhbat rejimi!</b>\n\n"
+            "Nemis tili haqida istalgan savolingizni bering.\n"
+            "Men o\'zbek tilida tushuntiraman va misollar keltiraman.\n\n"
+            "<i>Savolingizni yozing! 💬</i>",
+            parse_mode="HTML",
+            reply_markup=get_ai_stop_menu()
+        )
+
+    elif data == "ai_stop":
+        from handlers.messages import user_states
+        user_states.pop(user_id, None)
+        await query.edit_message_text(
+            "✅ <b>AI Chat tugatildi.</b>\n\nAsosiy menyuga qaytdingiz.",
+            parse_mode="HTML"
+        )
+        await context.bot.send_message(user_id, "Asosiy menyu:", reply_markup=get_main_menu())
+
     # === ADMIN ===
     elif data == "admin_stats":
         from utils.database import get_stats

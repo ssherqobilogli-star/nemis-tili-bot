@@ -12,6 +12,9 @@ ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
 
 # Groq API
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+# Anthropic Claude API (AI Chat uchun)
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 GROQ_MODEL = "llama-3.1-70b-versatile"  # yoki "mixtral-8x7b-32768"
 
 # Bot sozlamalari
